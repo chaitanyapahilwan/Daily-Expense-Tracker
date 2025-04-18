@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Expense Tracker</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #a8edea, #fed6e3);
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            color: #2c3e50;
+        }
+
+        .container, .auth-container {
+            max-width: 450px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(44, 62, 80, 0.1);
+            margin-top: 50px;
+        }
+
+        h2 {
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #bdc3c7;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .profile-bar {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            background: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            display: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .profile-bar:hover {
+            background-color: #2980b9;
+        }
+
+        .profile-dropdown {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 20px;
+            background: white;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: left;
+            min-width: 220px;
+            z-index: 1000;
+        }
+
+        .profile-dropdown p {
+            margin: 5px 0;
+            color: #2c3e50;
+        }
+
+        .profile-dropdown button {
+            width: 100%;
+            margin-top: 8px;
+            padding: 10px;
+            font-weight: bold;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .profile-dropdown button:hover {
+            background-color: #2980b9;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(44, 62, 80, 0.1);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .delete-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .category-total {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(44, 62, 80, 0.1);
+        }
+
+        .category-total h4 {
+            margin-top: 0;
+        }
+
+        .category-total p {
+            font-size: 16px;
+            margin: 5px 0;
+            color: #2c3e50;
+        }
+
+        .auth-container p {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        .auth-container a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .auth-container a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="profile-bar" id="profileBar" onclick="toggleProfileMenu()">Profile ▼</div>
+
+    <div class="profile-dropdown" id="profileDropdown">
+        <p><strong>Email:</strong> <span id="profileEmail"></span></p>
+        <button onclick="changePassword()">Change Password</button>
+        <button onclick="deleteAccount()">Delete Account</button>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <div id="loginPage" class="auth-container">
+        <h2>Login</h2>
+        <input type="email" id="loginEmail" placeholder="Email" required>
+        <input type="password" id="loginPassword" placeholder="Password" required>
+        <button onclick="login()">Login</button>
+        <p>Don't have an account? <a href="#" onclick="showSignUp()">Sign Up</a></p>
+    </div>
+
+    <div id="signUpPage" class="auth-container" style="display: none;">
+        <h2>Sign Up</h2>
+        <input type="email" id="signUpEmail" placeholder="Email" required>
+        <input type="password" id="signUpPassword" placeholder="Password" required>
+        <button onclick="signUp()">Sign Up</button>
+        <p>Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
+    </div>
+
+    <div id="expenseTracker" class="container" style="display: none;">
+        <h2>Daily Expense Tracker</h2>
+        <input type="number" id="expenseAmount" placeholder="Amount">
+        <select id="expenseCategory">
+            <option value="Food">Food</option>
+            <option value="Transport">Transport</option>
+            <option value="Shopping">Shopping</option>
+            <option value="Stationery">Stationery</option>
+            <option value="Other">Other</option>
+        </select>
+        <button onclick="addExpense()">Add Expense</button>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Amount (₹)</th>
+                    <th>Category</th>
+                    <th>Date & Time</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="expenseTable"></tbody>
+        </table>
+
+        <h3>Total Expenses: ₹<span id="totalAmount">0</span></h3>
+
+        <div class="category-total" id="categoryTotals">
+            <!-- Category totals will appear here -->
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let expenses = JSON.parse(localStorage.getItem('expenses')) || {};
+
+        window.onload = function () {
+            if (localStorage.getItem("loggedIn") === "true") {
+                currentUser = localStorage.getItem("currentUser");
+                showTracker();
+                loadExpenses();
+            } else {
+                showLogin();
+            }
+        };
+
+        function showLogin() {
+            document.getElementById("loginPage").style.display = "block";
+            document.getElementById("signUpPage").style.display = "none";
+            document.getElementById("expenseTracker").style.display = "none";
+            document.getElementById("profileBar").style.display = "none";
+            document.getElementById("profileDropdown").style.display = "none";
+        }
+
+        function showSignUp() {
+            document.getElementById("loginPage").style.display = "none";
+            document.getElementById("signUpPage").style.display = "block";
+            document.getElementById("expenseTracker").style.display = "none";
+            document.getElementById("profileBar").style.display = "none";
+            document.getElementById("profileDropdown").style.display = "none";
+        }
+
+        function showTracker() {
+            document.getElementById("loginPage").style.display = "none";
+            document.getElementById("signUpPage").style.display = "none";
+            document.getElementById("expenseTracker").style.display = "block";
+            document.getElementById("profileBar").style.display = "block";
+            document.getElementById("profileEmail").textContent = currentUser;
+        }
+
+        function signUp() {
+            let email = document.getElementById("signUpEmail").value;
+            let password = document.getElementById("signUpPassword").value;
+            let users = JSON.parse(localStorage.getItem("users")) || [];
+
+            if (users.some(user => user.email === email)) {
+                alert("Email already registered.");
+                return;
+            }
+
+            users.push({ email, password });
+            localStorage.setItem("users", JSON.stringify(users));
+            alert("Account created successfully.");
+            showLogin();
+        }
+
+        function login() {
+            let email = document.getElementById("loginEmail").value;
+            let password = document.getElementById("loginPassword").value;
+            let users = JSON.parse(localStorage.getItem("users")) || [];
+
+            let user = users.find(user => user.email === email && user.password === password);
+            if (user) {
+                currentUser = email;
+                localStorage.setItem("loggedIn", "true");
+                localStorage.setItem("currentUser", email);
+                showTracker();
+                loadExpenses();
+            } else {
+                alert("Invalid email or password.");
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem("loggedIn");
+            localStorage.removeItem("currentUser");
+            currentUser = null;
+            showLogin();
+        }
+
+        function deleteAccount() {
+            let users = JSON.parse(localStorage.getItem("users")) || [];
+            users = users.filter(user => user.email !== currentUser);
+            localStorage.setItem("users", JSON.stringify(users));
+            logout();
+        }
+
+        function changePassword() {
+            let newPassword = prompt("Enter new password:");
+            if (newPassword) {
+                let users = JSON.parse(localStorage.getItem("users")) || [];
+                users.forEach(user => {
+                    if (user.email === currentUser) user.password = newPassword;
+                });
+                localStorage.setItem("users", JSON.stringify(users));
+                alert("Password updated successfully.");
+            }
+        }
+
+        function toggleProfileMenu() {
+            let dropdown = document.getElementById("profileDropdown");
+            dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+        }
+
+        function addExpense() {
+            let amount = parseFloat(document.getElementById("expenseAmount").value);
+            let category = document.getElementById("expenseCategory").value;
+            let date = new Date().toLocaleString();
+
+            if (!amount || amount <= 0) {
+                alert("Please enter a valid amount.");
+                return;
+            }
+
+            if (!expenses[currentUser]) {
+                expenses[currentUser] = [];
+            }
+
+            expenses[currentUser].push({ amount, category, date });
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+            loadExpenses();
+            document.getElementById("expenseAmount").value = "";
+        }
+
+        function loadExpenses() {
+            let tableBody = document.getElementById("expenseTable");
+            let totalAmount = 0;
+            let categoryTotals = {};
+
+            tableBody.innerHTML = "";
+
+            if (expenses[currentUser] && expenses[currentUser].length > 0) {
+                expenses[currentUser].forEach((expense, index) => {
+                    let row = tableBody.insertRow();
+                    let amountCell = row.insertCell(0);
+                    let categoryCell = row.insertCell(1);
+                    let dateCell = row.insertCell(2);
+                    let actionCell = row.insertCell(3);
+
+                    amountCell.textContent = expense.amount;
+                    categoryCell.textContent = expense.category;
+                    dateCell.textContent = expense.date;
+                    actionCell.innerHTML = `<button class="delete-btn" onclick="deleteExpense(${index})">Delete</button>`;
+
+                    totalAmount += expense.amount;
+
+                    // Update category totals
+                    if (!categoryTotals[expense.category]) {
+                        categoryTotals[expense.category] = 0;
+                    }
+                    categoryTotals[expense.category] += expense.amount;
+                });
+            }
+
+            document.getElementById("totalAmount").textContent = totalAmount;
+
+            // Show category-wise totals
+            let categoryTotalDiv = document.getElementById("categoryTotals");
+            categoryTotalDiv.innerHTML = "<h4>Category-wise Totals:</h4>";
+
+            for (let category in categoryTotals) {
+                categoryTotalDiv.innerHTML += `<p>${category}: ₹${categoryTotals[category]}</p>`;
+            }
+        }
+
+        function deleteExpense(index) {
+            expenses[currentUser].splice(index, 1);
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+            loadExpenses();
+        }
+    </script>
+    <script>
+        fetch('get_expenses.php?user_id=1')
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                let html = "<h2>User Expenses</h2><ul>";
+                data.forEach(expense => {
+                    html += <li>${expense.EXPENSE_DATE} - ₹${expense.AMOUNT} (${expense.DESCIPTION})</li>;
+                });
+                html += "</ul>";
+                document.body.innerHTML += html;
+            })
+            .catch(error => console.error('Error:', error));
+    </script>
+</body>
+</html>
